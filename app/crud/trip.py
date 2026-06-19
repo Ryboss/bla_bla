@@ -7,7 +7,6 @@ from app.shemas.trip import TripCreateSchema, TripUpdateSchema, TripOutSchema, T
 from app.models.trip import Trip
 
 async def crud_create_trip(db: AsyncSession, trip: TripCreateSchema):
-    print(trip)
     db_trip = Trip(
         departure_city=trip.departure_city,
         arrival_city=trip.arrival_city,
@@ -21,14 +20,16 @@ async def crud_create_trip(db: AsyncSession, trip: TripCreateSchema):
     await db.refresh(db_trip)
     return db_trip
 
+
 async def crud_get_trip(db: AsyncSession, trip_id: int):
     result = await db.execute(select(Trip).where(Trip.id == trip_id))
     return result.scalar_one_or_none()
 
+
 async def crud_list_trips(db: AsyncSession, skip: int = 0, limit: int = 100):
     result = await db.execute(select(Trip).offset(skip).limit(limit))
-
     return result.scalars().all()
+
 
 async def crud_update_trip(db: AsyncSession, trip_id: int, updates: TripUpdateSchema):
     db_trip = await crud_get_trip(db, trip_id)
@@ -50,17 +51,20 @@ async def crud_update_trip(db: AsyncSession, trip_id: int, updates: TripUpdateSc
 
     return db_trip
 
+
 async def crud_delete_trip(db: AsyncSession, trip_id: int):
     db_trip = await crud_get_trip(db, trip_id)
-    print(db_trip)
+
     if not db_trip:
         return False
+
     await db.delete(db_trip)
     await db.commit()
     return True
 
+
 async def crud_filtered_trips(db: AsyncSession, filters: TripFilterSchema, skip: int = 0, limit: int = 100):
-    filters_result = filters.model_dump(exclude_none=True)
-    result = await db.execute(select(Trip).filter_by(**filters_result))
-    print(result.scalars().all())
-    return result
+    query = filters.filter(select(Trip))
+
+    result = await db.execute(query)
+    return result.scalars().all()

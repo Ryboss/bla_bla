@@ -1,7 +1,9 @@
-from pydantic import BaseModel
-from datetime import datetime
-from typing import Optional
+from pydantic import BaseModel, Field
+from datetime import datetime, timezone
 from pydantic import field_validator
+from fastapi_filter.contrib.sqlalchemy import Filter
+
+from app.models.trip import Trip
 
 
 class TripBaseSchema(BaseModel):
@@ -11,23 +13,25 @@ class TripBaseSchema(BaseModel):
     departure_time: datetime
     arrival_time: datetime
 
-    price: float
+    price: float = Field(default=None, gt=0)
 
-    available_seats: int
-
-    @field_validator("departure_time", "arrival_time")
-    @classmethod
-    def remove_timezone(cls, value: datetime):
-        if value.tzinfo is not None:
-            return value.replace(tzinfo=None)
-        return value
+    available_seats: int = Field(gt=0)
 
 
 class TripCreateSchema(TripBaseSchema):
-    pass
+    @field_validator("departure_time", "arrival_time")
+    @classmethod
+    def remove_timezone(cls, value: datetime):
+        now = datetime.now(timezone.utc)
+
+        if value < now:
+            raise ValueError(
+                "Departure and arrival times cannot be earlier than the current time"
+            )
+        return value
 
 
-class TripUpdateSchema(BaseModel):
+class TripUpdateSchema(TripCreateSchema):
     departure_city: str | None = None
     arrival_city: str | None = None
 
@@ -36,16 +40,33 @@ class TripUpdateSchema(BaseModel):
 
     price: float | None = None
 
-    available_seats: int | None = None
+    available_seats: int | None = Field(default=None, gt=0)
 
     created_at: datetime | None = None
 
 
-class TripFilterSchema(TripUpdateSchema):
-    pass
-
-
 class TripOutSchema(TripBaseSchema):
     id: int
+
     class Config:
         orm_mode = True
+
+
+class TripFilterSchema(Filter):
+    departure_city: str | None = None
+    arrival_city: str | None = None
+
+    price__gte: float | None = None
+    price__lte: float | None = None
+
+    available_seats__gte: int | None = None
+    available_seats__lte: int | None = None
+
+    departure_time__gte: datetime | None = None
+    departure_time__lte: datetime | None = None
+
+    arrival_time__gte: datetime | None = None
+    arrival_time__lte: datetime | None = None
+
+    class Constants(Filter.Constants):
+        model = Trip

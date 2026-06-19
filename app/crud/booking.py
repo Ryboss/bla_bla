@@ -10,7 +10,6 @@ from app.models.booking import Booking
 router = APIRouter()
 
 
-
 async def crud_create_booking(db: AsyncSession, trip_id: int, booking: BookingCreateSchema):
     db_trip = await crud_get_trip(db, trip_id)
 
@@ -41,15 +40,17 @@ async def crud_create_booking(db: AsyncSession, trip_id: int, booking: BookingCr
 
     return db_booking
 
+
 async def crud_get_booking(db: AsyncSession, booking_id: int):
     result = await db.execute(select(Booking).where(Booking.id == booking_id))
 
     return result.scalar_one_or_none()
 
+
 async def crud_list_bookings_for_trip(db: AsyncSession, trip_id: int):
     result = await db.execute(select(Booking).where(Booking.trip_id == trip_id))
-    # print(result.scalar_one_or_none())
     return result.scalars().all()
+
 
 async def crud_delete_booking(db: AsyncSession, booking_id: int):
     booking = await crud_get_booking(db, booking_id)
@@ -61,9 +62,6 @@ async def crud_delete_booking(db: AsyncSession, booking_id: int):
 
     if not trip:
         return False
-
-    print(trip)
-    print(booking)
 
     trip.available_seats += booking.seats_booked
 
