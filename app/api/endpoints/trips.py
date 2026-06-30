@@ -11,26 +11,36 @@ from app.crud.trip import (
 from app.shemas.trip import TripCreateSchema, TripOutSchema, TripUpdateSchema, TripFilterSchema
 from app.crud.booking import crud_list_bookings_for_trip
 from app.database.database import get_db
+from app.api.dependencies.auth import get_current_user
 
 
 router = APIRouter()
 
 
 @router.post("/", response_model=TripOutSchema)
-async def create_trip(trip: TripCreateSchema, db: AsyncSession = Depends(get_db)):
+async def create_trip(
+        trip: TripCreateSchema,
+        db: AsyncSession = Depends(get_db),
+        current_user=Depends(get_current_user)
+):
     if trip.available_seats <= 0:
         raise HTTPException(status_code=422, detail="The number of seats cannot be less than one")
     return await crud_create_trip(db, trip)
 
 
 @router.get("/", response_model=list[TripOutSchema])
-async def list_trips(skip: int = 0, limit: int = 100, db: AsyncSession = Depends(get_db)):
+async def list_trips(
+        skip: int = 0,
+        limit: int = 100,
+        db: AsyncSession = Depends(get_db),
+        current_user=Depends(get_current_user)
+):
     trips = await crud_list_trips(db, skip, limit)
     return trips
 
 
 @router.get("/{trip_id}", response_model=TripOutSchema)
-async def get_trip(trip_id: int, db: AsyncSession = Depends(get_db)):
+async def get_trip(trip_id: int, db: AsyncSession = Depends(get_db), current_user=Depends(get_current_user)):
     db_trip = await crud_get_trip(db, trip_id)
     if not db_trip:
         raise HTTPException(status_code=404, detail="Trip not found")
@@ -38,7 +48,12 @@ async def get_trip(trip_id: int, db: AsyncSession = Depends(get_db)):
 
 
 @router.put("/{trip_id}", response_model=TripOutSchema)
-async def update_trip(trip_id: int, updates: TripUpdateSchema, db: AsyncSession = Depends(get_db)):
+async def update_trip(
+        trip_id: int,
+        updates: TripUpdateSchema,
+        db: AsyncSession = Depends(get_db),
+        current_user=Depends(get_current_user)
+):
     seats_booked = await crud_list_bookings_for_trip(db, trip_id)
     seats_booked_sum = sum([i.seats_booked for i in seats_booked])
 
@@ -52,7 +67,7 @@ async def update_trip(trip_id: int, updates: TripUpdateSchema, db: AsyncSession 
 
 
 @router.delete("/{trip_id}", status_code=204)
-async def delete_trip(trip_id: int, db: AsyncSession = Depends(get_db)):
+async def delete_trip(trip_id: int, db: AsyncSession = Depends(get_db), current_user=Depends(get_current_user)):
     ok = await crud_delete_trip(db, trip_id)
     if not ok:
         raise HTTPException(status_code=404, detail="Trip not found")
@@ -60,6 +75,12 @@ async def delete_trip(trip_id: int, db: AsyncSession = Depends(get_db)):
 
 
 @router.post("/filter", status_code=200)
-async def filtered_trips(filters: TripFilterSchema, skip: int = 0, limit: int = 100, db: AsyncSession = Depends(get_db)):
+async def filtered_trips(
+        filters: TripFilterSchema,
+        skip: int = 0,
+        limit: int = 100,
+        db: AsyncSession = Depends(get_db),
+        current_user=Depends(get_current_user)
+):
     result = await crud_filtered_trips(db, filters, skip, limit)
     return result
