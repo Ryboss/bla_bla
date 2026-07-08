@@ -82,8 +82,7 @@ export function DashboardPage() {
             <span className="eyebrow">Главная</span>
             <h1>Рабочее пространство сервиса поездок</h1>
             <p className="hero-text">
-              Теперь интерфейс разбит на отдельные страницы: авторизация, список поездок, создание поездки,
-              детали поездки, поиск и просмотр брони.
+             Поиск дешевых поездок
             </p>
             <div className="hero-actions">
               <NavLink className="button" to="/trips">Все поездки</NavLink>

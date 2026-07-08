@@ -15,7 +15,7 @@ class TripBaseSchema(BaseModel):
 
     price: float = Field(default=None, gt=0)
 
-    available_seats: int = Field(gt=0)
+    available_seats: int
 
 
 class TripCreateSchema(TripBaseSchema):
@@ -40,7 +40,7 @@ class TripUpdateSchema(TripCreateSchema):
 
     price: float | None = None
 
-    available_seats: int | None = Field(default=None, gt=0)
+    available_seats: int | None
 
     created_at: datetime | None = None
 

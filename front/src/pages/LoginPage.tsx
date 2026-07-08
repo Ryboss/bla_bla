@@ -53,21 +53,6 @@ export function LoginPage() {
     }
   }
 
-  function handleManualToken(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault()
-
-    if (!manualToken.trim()) {
-      setError('Вставьте JWT токен перед сохранением.')
-      return
-    }
-
-    setToken(manualToken.trim())
-    navigate('/dashboard', {
-      replace: true,
-      state: { notice: { kind: 'success', text: 'Токен сохранён, доступ к защищённым страницам открыт.' } },
-    })
-  }
-
   return (
     <>
       <Section title="Авторизация" subtitle="После успешного входа будет редирект на главную страницу приложения.">
@@ -96,16 +81,6 @@ export function LoginPage() {
               </NavLink>
             </div>
           </form>
-
-          <div className="panel">
-            <h3>JWT вручную</h3>
-            <form className="form-grid" onSubmit={handleManualToken}>
-              <Field label="Bearer token">
-                <textarea className="textarea" rows={8} value={manualToken} onChange={(event) => setManualToken(event.target.value)} placeholder="eyJhbGciOi..." />
-              </Field>
-              <button className="button" type="submit">Сохранить токен</button>
-            </form>
-          </div>
         </div>
       </Section>
 

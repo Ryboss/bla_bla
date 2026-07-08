@@ -150,6 +150,8 @@ a {
 
 .section {
     margin-top: 22px;
+    margin-left: 200px;
+    margin-right: 200px
 }
 
 .section-head,
@@ -212,7 +214,7 @@ a {
 .info-grid,
 .auth-grid,
 .detail-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+
 }
 
 .hero-card,
@@ -397,6 +399,7 @@ a {
 
 .card-actions--left {
     justify-content: flex-start;
+    margin-top: 15px
 }
 
 .form-grid {

@@ -35,8 +35,7 @@ export function AppLayout(props: { children: ReactNode }) {
             BlaBla Front
           </NavLink>
           <p className="brand-subtitle">
-            Разделённый по страницам React-интерфейс для поездок, броней и
-            маршрутов.
+            Поиск дешевых поездок
           </p>
         </div>
 
@@ -53,7 +52,7 @@ export function AppLayout(props: { children: ReactNode }) {
                 Создать поездку
               </NavLink>
               <NavLink to="/bookings/find" className={navLinkClassName}>
-                Найти бронь
+                Бронирования
               </NavLink>
             </>
           ) : (
