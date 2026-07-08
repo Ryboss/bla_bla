@@ -21,8 +21,8 @@ export type Booking = {
 export type AuthUser = Record<string, unknown> & {
   id?: number | string
   email?: string
-  username?: string
-  name?: string
+  fullname?: string
+  password?: string
 }
 
 export type TripPayload = {
